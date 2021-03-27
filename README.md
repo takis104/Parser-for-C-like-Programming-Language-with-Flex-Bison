@@ -8,3 +8,5 @@ Implementation of a lexical analyzer using FLEX and a syntax analyzer using BISO
 In this project, the above mentioned custom made programming language will also be described in BNF form.
 
 Created by Christos-Panagiotis Balatsouras, StudentID: 1054335
+
+All the provided documentation is in Greek language.
