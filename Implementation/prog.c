@@ -1,2 +1,0 @@
-PROGRAM my_Program
-
