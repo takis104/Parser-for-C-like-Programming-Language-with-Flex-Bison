@@ -11,10 +11,14 @@ extern int yylineno;
 #define YYERROR_VERBOSE 1
 %}
 
-%token PROGRAM NAME ARRAY NUM COMP_OPERATOR
+%union {
+	char *str;
+}
+
+%token PROGRAM NAME ARRAY NUM COMP_OPERATOR AND OR
 %token VARS DATATYPE FUNCTION END_FUNCTION RETURN
 %token WHILE ENDWHILE
-%token FOR ASSIGN TO STEP ENDFOR
+%token FOR ASSIGN_OPERATOR TO STEP ENDFOR
 %token IF THEN ELSEIF ELSE ENDIF
 %token SWITCH CASE DEFAULT ENDSWITCH
 %token PRINT
@@ -23,7 +27,7 @@ extern int yylineno;
 %left ','
 %left '+' '-'
 %left '*' '/'
-%right '^'
+%left '^'
 
 %start program
 
@@ -59,6 +63,7 @@ function_end: RETURN variable END_FUNCTION
 command: assignment
        | loop_statement
        | break_command
+       | control_statement
        ;
        
 commands: command newline
@@ -75,15 +80,45 @@ loop_statement: while_statement
               
 break_command: BREAK ';' { printf("Break command found\n"); }
              ;
+             
+control_statement: if_statement
+                 | switch_statement
+                 ;
           
 while_statement: WHILE '(' condition ')' newline commands ENDWHILE { printf("While Loop statement found\n"); }
                ;
                
 condition: expression COMP_OPERATOR expression
+         | expression AND expression
+         | expression OR expression
          ;
                
-for_statement: FOR NAME ASSIGN NUM TO NUM STEP NUM newline commands ENDFOR { printf("For Loop statement found\n"); }
+for_statement: FOR NAME ASSIGN_OPERATOR NUM TO NUM STEP NUM newline commands ENDFOR { printf("For Loop statement found\n"); }
              ;
+             
+if_statement: IF '(' condition ')' THEN newline commands ENDIF { printf("If statement found\n"); }
+            | IF '(' condition ')' THEN newline commands else_if_statement ENDIF { printf("If statement found\n"); }
+            | IF '(' condition ')' THEN newline commands else_statement ENDIF { printf("If statement found\n"); }
+            | IF '(' condition ')' THEN newline commands else_if_statement else_statement ENDIF { printf("If statement found\n"); }
+            ;
+            
+else_if_statement: ELSEIF '(' condition ')' newline commands
+                 | ELSEIF '(' condition ')' newline commands else_if_statement
+                 ;
+                 
+else_statement: ELSE newline commands
+              ;
+              
+switch_statement: SWITCH '(' expression ')' newline case ENDSWITCH { printf("Switch statement found\n"); }
+                | SWITCH '(' expression ')' newline case default ENDSWITCH { printf("Switch statement found\n"); }
+                ;
+                
+case: CASE '(' expression ')' ':' newline commands
+    | CASE '(' expression ')' ':' newline commands case
+    ;
+    
+default: DEFAULT ':' newline commands
+       ;
 
 expression: NUM
           | variable
@@ -120,7 +155,7 @@ int main ( int argc, char **argv  )
         yyin = fopen( argv[0], "r" );
   else
         yyin = stdin;
-  yyout = fopen ( "output", "w" );	
+  yyout = fopen ( "output.c", "w" );
   yyparse ();
   printf("Lines of code parsed: %i\n", line);
   return 0;
