@@ -14,10 +14,15 @@ letter 	[a-zA-Z]
 chartype 	"CHAR"
 inttype	"INTEGER"
 comparative	">"|"<"|"=="|"!="
+char		.
+charsequence	{char}*
+strliteral	\"{charsequence}\"
+charliteral	"'"{char}"'"
+linecomment	"%"{charsequence}
 datatype	{chartype}|{inttype}
 basiccharacter	{underscore}|{letter}|{digit}
 number		{digit}+|{digit}+"."{digit}+
-basicstring 	{basiccharacter}*
+basicstring 	{basiccharacter}*	
 name 		{letter}{basicstring}|{underscore}{basicstring}
 array		"["{number}"]"
 
@@ -60,6 +65,11 @@ array		"["{number}"]"
 "ENDSWITCH"	{ yylval.str = strdup(yytext); ECHO; return ENDSWITCH; }
 "PRINT"	{ yylval.str = strdup(yytext); ECHO; return PRINT; }
 "BREAK"	{ yylval.str = strdup(yytext); ECHO; return BREAK; }
+"STARTMAIN"	{ yylval.str = strdup(yytext); ECHO; return STARTMAIN; }
+"ENDMAIN"	{ yylval.str = strdup(yytext); ECHO; return ENDMAIN; }
+{strliteral}	{ yylval.str = strdup(yytext); ECHO; return STRLITERAL; }
+{charliteral}	{ yylval.str = strdup(yytext); ECHO; return CHARLITERAL; }
+{linecomment}	{ yylval.str = strdup(yytext); ECHO; }
 {datatype}	{ yylval.str = strdup(yytext); ECHO; return DATATYPE; }
 {name}		{ yylval.str = strdup(yytext); ECHO; return NAME; }
 {number}	{ yylval.str = strdup(yytext); ECHO; return NUM; }

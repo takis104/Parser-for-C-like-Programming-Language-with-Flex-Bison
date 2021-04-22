@@ -1,0 +1,6 @@
+**** START of Parsing Diagnostic Messages ****
+
+Code Parsed successfully!
+Lines of code parsed: 38
+
+**** END of Parsing Diagnostic Messages ****
