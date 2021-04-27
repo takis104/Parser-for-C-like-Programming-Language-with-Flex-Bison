@@ -1,8 +1,8 @@
 **** START of Diagnostic Messages ****
 
-Program: __my_Program
-
 Code Parsed successfully!
-Lines of code parsed: 38
+Program: Sorting_Algorithms
+
+Lines of code parsed: 73
 
 **** END of Diagnostic Messages ****

@@ -6,6 +6,8 @@
 #include <string.h>
 %}
 
+%option yylineno
+
 underscore	"_"
 digit 		[0-9]
 letter 	[a-zA-Z]
@@ -26,6 +28,7 @@ array		"["{number}"]"
 
 %%
 
+[ \t]		{ yylval.str = strdup(yytext); ECHO; }
 "\n"		{ yylval.str = strdup(yytext); ECHO; return NEWLINE; }
 ";"		{ yylval.str = strdup(yytext); ECHO; return ';'; }
 ":"		{ yylval.str = strdup(yytext); ECHO; return ':'; }

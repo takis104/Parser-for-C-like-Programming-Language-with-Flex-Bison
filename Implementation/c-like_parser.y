@@ -11,7 +11,7 @@ extern FILE *yyin;
 extern FILE *yyout;
 extern int yylineno;
 int line = 0;
-FILE *p;
+FILE *diagnostics;
 char *progr;
 %}
 
@@ -38,11 +38,11 @@ char *progr;
 
 %%
 
-program: program_declaration main_statement newline { printf("Code Parsed successfully!\n"); fprintf(p, "Code Parsed successfully!\n"); }
-       | program_declaration function main_statement newline { printf("Code Parsed successfully!\n"); fprintf(p, "Code Parsed successfully!\n"); }
+program: program_declaration main_statement newline { printf("Code Parsed successfully!\n"); fprintf(diagnostics, "Code Parsed successfully!\n"); }
+       | program_declaration function main_statement newline { printf("Code Parsed successfully!\n"); fprintf(diagnostics, "Code Parsed successfully!\n"); }
        ;
 
-program_declaration: PROGRAM NAME newline { progr = $2; fprintf(p, "Program: %s\n\n", progr); printf("Program %s\n", progr); }
+program_declaration: PROGRAM NAME newline { progr = $2; }
                    ;
                    
 main_statement: STARTMAIN commands ENDMAIN /*{ printf("MAIN Statement found\n"); }*/
@@ -102,6 +102,9 @@ while_statement: WHILE '(' condition ')' newline commands ENDWHILE /*{ printf("W
 condition: expression COMP_OPERATOR expression
          | expression AND expression
          | expression OR expression
+         | '(' condition ')' COMP_OPERATOR '(' condition ')'
+         | '(' condition ')' AND '(' condition ')'
+         | '(' condition ')' OR '(' condition ')'
          ;
                
 for_statement: FOR NAME ASSIGN_OPERATOR NUM TO NUM STEP NUM newline commands ENDFOR /*{ printf("For Loop statement found\n"); }*/
@@ -165,7 +168,7 @@ newline: NEWLINE { line++; }
 void yyerror(char *s) 
 {
     fprintf(stderr, "ERROR: %s in line %d\n", s, yylineno);
-    fprintf(p, "ERROR: %s in line %d\n", s, yylineno);
+    fprintf(diagnostics, "ERROR: %s in line %d\n", s, yylineno);
 }									
 
 
@@ -177,16 +180,20 @@ int main ( int argc, char **argv  )
 	else
 	        yyin = stdin;
 	yyout = fopen ( "output.c", "w" );
-  
-	p = fopen("diagnostics.txt", "w");
-	fprintf(p, "**** START of Diagnostic Messages ****\n\n");
-  
+	
+	printf("C-like parser, implemented by Christos-Panagiotis Mpalatsouras, Student ID = 1054335\n");
+	
+	diagnostics = fopen("diagnostics.txt", "w");
+	fprintf(diagnostics, "**** START of Diagnostic Messages ****\n\n");
+	
 	yyparse ();
 	
+	printf("Program Name: %s\n", progr);
+	fprintf(diagnostics, "Program: %s\n\n", progr);
 	printf("Lines of code parsed: %i\n", line);
-	fprintf(p, "Lines of code parsed: %i\n", line);
-	fprintf(p, "\n**** END of Diagnostic Messages ****\n");
-	fclose(p);
+	fprintf(diagnostics, "Lines of code parsed: %i\n", line);
+	fprintf(diagnostics, "\n**** END of Diagnostic Messages ****\n");
+	fclose(diagnostics);
   
 	return 0;
 }			
