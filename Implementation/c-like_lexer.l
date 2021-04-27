@@ -6,8 +6,6 @@
 #include <string.h>
 %}
 
-%option noyywrap yylineno
-
 underscore	"_"
 digit 		[0-9]
 letter 	[a-zA-Z]

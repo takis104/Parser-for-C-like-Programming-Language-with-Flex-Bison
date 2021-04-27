@@ -1,6 +1,8 @@
-**** START of Parsing Diagnostic Messages ****
+**** START of Diagnostic Messages ****
+
+Program: __my_Program
 
 Code Parsed successfully!
 Lines of code parsed: 38
 
-**** END of Parsing Diagnostic Messages ****
+**** END of Diagnostic Messages ****

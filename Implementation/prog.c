@@ -25,7 +25,7 @@ ELSE
 	var3 = '@';
 	var3 = "string literal content";
 	var3 = 3.1415;
-ENDIF
+ENDIF % THIS IS AN ONE LINE COMENT, NA' HAME NA LEGAME KAI TA LOIPA
 SWITCH (val)
 CASE (1):
 	var1 = 0;
@@ -34,5 +34,5 @@ CASE (2):
 DEFAULT:
 	val0 = 1;
 ENDSWITCH
-PRINT("text to print and number1 = %d\n", val1);
+PRINT("text to print and number1 = %d%d%d%d\n", val1, val2, val3, val43);
 ENDMAIN
