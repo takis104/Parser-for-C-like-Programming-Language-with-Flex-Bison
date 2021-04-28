@@ -10,3 +10,10 @@ In this project, the above mentioned custom made programming language will also 
 Created by Christos-Panagiotis Balatsouras, StudentID: 1054335
 
 All the provided documentation is in Greek language.
+
+## Make instructions for Linux
+1. bison -y -d c-like_parser.y
+2. flex c-like_lexer.l
+3. gcc y.tab.c lex.yy.c -lfl
+4. ./a.out prog.c
+
