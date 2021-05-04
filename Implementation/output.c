@@ -1,5 +1,9 @@
 PROGRAM Sorting_Algorithms %This is a test program for lexer and parser development purposes
-FUNCTION BubbleSort(K[20], m)
+TYPEDEF STRUCT Node
+	VARS INTEGER value;
+	VARS Node prev;
+	VARS Node next;
+Node ENDSTRUCT FUNCTION BubbleSort(K[20], m)
 	VARS INTEGER i,j,head,temp;
 	i = 0;
 	j = 0;
