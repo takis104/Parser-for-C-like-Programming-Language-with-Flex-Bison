@@ -20,7 +20,8 @@ char *progr;
 }
 
 %token PROGRAM <str>NAME ARRAY NUM COMP_OPERATOR AND OR STRLITERAL CHARLITERAL
-%token VARS DATATYPE FUNCTION END_FUNCTION RETURN
+%token TYPEDEF STRUCT ENDSTRUCT
+%token VARS DATATYPE USERDATATYPE FUNCTION END_FUNCTION RETURN
 %token STARTMAIN ENDMAIN
 %token WHILE ENDWHILE
 %token FOR ASSIGN_OPERATOR TO STEP ENDFOR
@@ -40,17 +41,31 @@ char *progr;
 
 program: program_declaration main_statement newline { printf("Code Parsed successfully!\n"); fprintf(diagnostics, "Code Parsed successfully!\n"); }
        | program_declaration function main_statement newline { printf("Code Parsed successfully!\n"); fprintf(diagnostics, "Code Parsed successfully!\n"); }
+       | program_declaration struct_statement main_statement newline { printf("Code Parsed successfully!\n"); fprintf(diagnostics, "Code Parsed successfully!\n"); }
+       | program_declaration struct_statement function main_statement newline { printf("Code Parsed successfully!\n"); fprintf(diagnostics, "Code Parsed successfully!\n"); }
        ;
 
 program_declaration: PROGRAM NAME newline { progr = $2; }
                    ;
                    
+struct_statement: STRUCT NAME newline struct_variable ENDSTRUCT
+                | STRUCT NAME newline struct_variable ENDSTRUCT struct_statement
+                | TYPEDEF STRUCT USERDATATYPE newline struct_variable USERDATATYPE ENDSTRUCT
+                | TYPEDEF STRUCT USERDATATYPE newline struct_variable USERDATATYPE ENDSTRUCT struct_statement
+                ;
+                
+struct_variable: VARS datatype NAME ';' newline
+               | VARS datatype NAME ARRAY ';' newline
+               | VARS datatype NAME ';' newline variable_declaration
+               | VARS datatype NAME ARRAY ';' newline variable_declaration
+               ;
+
 main_statement: STARTMAIN commands ENDMAIN /*{ printf("MAIN Statement found\n"); }*/
               | STARTMAIN variable_declaration commands ENDMAIN /*{ printf("MAIN Statement found\n"); }*/
               ;
                    
-variable_declaration: VARS DATATYPE variable ';' newline /*{ printf("Variable Statement found\n"); }*/
-                    | VARS DATATYPE variable ';' newline variable_declaration /*{ printf("Variable Statement found\n"); }*/
+variable_declaration: VARS datatype variable ';' newline /*{ printf("Variable Statement found\n"); }*/
+                    | VARS datatype variable ';' newline variable_declaration /*{ printf("Variable Statement found\n"); }*/
                     ;
                     
 function: function_declaration commands function_end newline /*{ printf("Function Statement found\n"); }*/
@@ -148,6 +163,10 @@ expression: literal
           | expression '/' expression
           | '(' expression ')'
           ;
+          
+datatype: DATATYPE
+        | USERDATATYPE
+        ;
 
 variable: NAME
         | NAME ARRAY
@@ -182,10 +201,11 @@ int main ( int argc, char **argv  )
 	yyout = fopen ( "output.c", "w" );
 	
 	printf("C-like parser, implemented by Christos-Panagiotis Mpalatsouras, Student ID = 1054335\n");
+	printf("Program source code from parser input is following: \n\n");
 	
 	diagnostics = fopen("diagnostics.txt", "w");
 	fprintf(diagnostics, "**** START of Diagnostic Messages ****\n\n");
-	
+  
 	yyparse ();
 	
 	printf("Program Name: %s\n", progr);
@@ -196,4 +216,4 @@ int main ( int argc, char **argv  )
 	fclose(diagnostics);
   
 	return 0;
-}			
+}
