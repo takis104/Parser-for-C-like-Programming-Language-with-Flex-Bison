@@ -12,6 +12,9 @@ Created by Christos-Panagiotis Balatsouras, StudentID: 1054335
 All the provided documentation is in Greek language.
 
 ## Make instructions for Linux
+
+Flex and Bison must be installed in the Linux machine before.
+
 1. bison -y -d c-like_parser.y
 2. flex c-like_lexer.l
 3. gcc y.tab.c lex.yy.c -lfl
