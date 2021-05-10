@@ -83,6 +83,36 @@ void functionListAppend(struct functionEntity** head_rf, char *name)
 	return;
 }
 
+int variableSearch(struct variableEntity* head, char *key)
+{
+	struct variableEntity* lookup = head;
+	
+	while(lookup != NULL)
+	{
+		if(lookup->Name == key)
+		{
+			return 1;
+		}
+		lookup = lookup->next;
+	}
+	return 0;
+}
+
+int functionSearch(struct functionEntity* head, char *key)
+{
+	struct functionEntity* lookup = head;
+	
+	while(lookup != NULL)
+	{
+		if(lookup->Name == key)
+		{
+			return 1;
+		}
+		lookup = lookup->next;
+	}
+	return 0;
+}
+
 int main()
 {
 	/*Example Driver Program for testing Linked Lists*/
@@ -99,6 +129,24 @@ int main()
 	
 	printf("Function List Items: \n");
 	printFunctionList(head2);
+	
+	if(variableSearch(head, "var1") == 1) 
+	{
+		printf("Variable Found\n");
+	}
+	else
+	{
+		printf("Variable NOT Found\n");
+	}
+	
+	if(functionSearch(head2, "funcName") == 1)
+	{
+		printf("Function Found\n");
+	}
+	else
+	{
+		printf("Function NOT Found\n");
+	}
 	
 	return 0;
 }
