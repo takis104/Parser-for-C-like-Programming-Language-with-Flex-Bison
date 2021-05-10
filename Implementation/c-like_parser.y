@@ -13,20 +13,17 @@ extern int yylineno;
 int line = 0;
 FILE *diagnostics;
 char *progr;
-
 struct variableEntity
 {
 	char *Name;
 	char *DataType;
 	struct variableEntity *next;
 };
-
 struct functionEntity
 {
 	char *Name;
 	struct functionEntity *next;
 };
-
 void printVariableList(struct variableEntity *node)
 {
 	while(node != NULL)
@@ -35,7 +32,6 @@ void printVariableList(struct variableEntity *node)
 		node = node->next;
 	}
 }
-
 void printFunctionList(struct functionEntity *node)
 {
 	while(node != NULL)
@@ -44,7 +40,6 @@ void printFunctionList(struct functionEntity *node)
 		node = node->next;
 	}
 }
-
 void variableListAppend(struct variableEntity** head_rf, char *name, char *type)
 {
 	struct variableEntity* new_var = (struct variableEntity*) malloc(sizeof(struct variableEntity));
@@ -69,7 +64,6 @@ void variableListAppend(struct variableEntity** head_rf, char *name, char *type)
 	
 	return;
 }
-
 void functionListAppend(struct functionEntity** head_rf, char *name)
 {
 	struct functionEntity* new_var = (struct functionEntity*) malloc(sizeof(struct functionEntity));
@@ -93,7 +87,6 @@ void functionListAppend(struct functionEntity** head_rf, char *name)
 	
 	return;
 }
-
 int variableSearch(struct variableEntity* head, char *key)
 {
 	struct variableEntity* lookup = head;
@@ -108,7 +101,6 @@ int variableSearch(struct variableEntity* head, char *key)
 	}
 	return 0;
 }
-
 int functionSearch(struct functionEntity* head, char *key)
 {
 	struct functionEntity* lookup = head;
