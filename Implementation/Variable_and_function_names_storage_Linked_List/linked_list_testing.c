@@ -6,7 +6,6 @@
 struct variableEntity
 {
 	char *Name;
-	char *DataType;
 	struct variableEntity *next;
 };
 
@@ -20,7 +19,7 @@ void printVariableList(struct variableEntity *node)
 {
 	while(node != NULL)
 	{
-		printf("Variable Name: %s, Variable Type: %s\n", node->Name, node->DataType);
+		printf("Variable Name: %s\n", node->Name);
 		node = node->next;
 	}
 }
@@ -34,13 +33,12 @@ void printFunctionList(struct functionEntity *node)
 	}
 }
 
-void variableListAppend(struct variableEntity** head_rf, char *name, char *type)
+void variableListAppend(struct variableEntity** head_rf, char *name)
 {
 	struct variableEntity* new_var = (struct variableEntity*) malloc(sizeof(struct variableEntity));
 	struct variableEntity *end = *head_rf;
 	
 	new_var->Name = name;
-	new_var->DataType = type;
 	new_var->next = NULL;
 	
 	if(*head_rf == NULL)
@@ -86,10 +84,10 @@ void functionListAppend(struct functionEntity** head_rf, char *name)
 int variableSearch(struct variableEntity* head, char *key)
 {
 	struct variableEntity* lookup = head;
-	
+
 	while(lookup != NULL)
 	{
-		if(lookup->Name == key)
+		if(strcmp(lookup->Name, key) == 0)
 		{
 			return 1;
 		}
@@ -104,7 +102,7 @@ int functionSearch(struct functionEntity* head, char *key)
 	
 	while(lookup != NULL)
 	{
-		if(lookup->Name == key)
+		if(strcmp(lookup->Name, key) == 0)
 		{
 			return 1;
 		}
@@ -119,10 +117,15 @@ int main()
 	struct variableEntity* head = NULL;
 	struct functionEntity* head2 = NULL;
 	
-	variableListAppend(&head, "var1", "INTEGER");
-	variableListAppend(&head, "var2", "INTEGER");
-	variableListAppend(&head, "var3", "CHAR");
+	variableListAppend(&head, "var1");
+	variableListAppend(&head, "var2");
+	variableListAppend(&head, "var3");
 	functionListAppend(&head2, "funcName");
+	
+	if(variableSearch(head, "var4") == 0) 
+	{
+		variableListAppend(&head, "var4");
+	}
 	
 	printf("Variable List Items: \n");
 	printVariableList(head);
@@ -130,7 +133,7 @@ int main()
 	printf("Function List Items: \n");
 	printFunctionList(head2);
 	
-	if(variableSearch(head, "var1") == 1) 
+	if(variableSearch(head, "var2") == 1) 
 	{
 		printf("Variable Found\n");
 	}
