@@ -29,7 +29,7 @@ array		"["{number}"]"
 
 %%
 
-[ \t]		{ yylval.str = strdup(yytext); ECHO; printf("%s",yytext);}
+[ \t]+		{ yylval.str = strdup(yytext); ECHO; printf("%s",yytext);}
 "\n"		{ yylval.str = strdup(yytext); ECHO; printf("%s",yytext); return NEWLINE; }
 ";"		{ yylval.str = strdup(yytext); ECHO; printf("%s",yytext); return ';'; }
 ":"		{ yylval.str = strdup(yytext); ECHO; printf("%s",yytext); return ':'; }

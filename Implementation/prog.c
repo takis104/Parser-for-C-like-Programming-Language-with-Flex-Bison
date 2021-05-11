@@ -3,8 +3,9 @@ TYPEDEF STRUCT Node
 	VARS INTEGER value;
 	VARS Node prev;
 	VARS Node next;
-Node ENDSTRUCT FUNCTION BubbleSort(K[20], m)
-	VARS INTEGER i,j,head,temp;
+Node ENDSTRUCT FUNCTION BubbleSort(K, m)
+	VARS INTEGER i,j,head,head2,temp;
+	VARS INTEGER K_i,K_i_plus_1,K_m;
 	i = 0;
 	j = 0;
 	head = m;
@@ -28,8 +29,8 @@ Node ENDSTRUCT FUNCTION BubbleSort(K[20], m)
 		head = head - 1;
 	ENDWHILE
 RETURN K_m END_FUNCTION
-FUNCTION InsertionSort(K[20], m)
-	VARS INTEGER i,j,k;
+FUNCTION InsertionSort(K, m)
+	VARS INTEGER i,j,k,K_i,K_i_plus_1,K_j,K_m;
 	i = 0;
 	j = 0;
 	k = 0;
@@ -45,6 +46,9 @@ FUNCTION InsertionSort(K[20], m)
 	ENDFOR
 RETURN K_m END_FUNCTION
 STARTMAIN VARS INTEGER n,i,c,A[20];
+	VARS INTEGER values[20];
+	VARS INTEGER option;
+	VARS INTEGER A_n,A_i;
 	n = 20;
 	A[20] = values;
 	PRINT("Initial Table: \n");

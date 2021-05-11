@@ -13,6 +13,110 @@ extern int yylineno;
 int line = 0;
 FILE *diagnostics;
 char *progr;
+struct variableEntity
+{
+	char *Name;
+	struct variableEntity *next;
+};
+struct functionEntity
+{
+	char *Name;
+	struct functionEntity *next;
+};
+void printVariableList(struct variableEntity *node)
+{
+	while(node != NULL)
+	{
+		printf("Variable Name: %s\n", node->Name);
+		node = node->next;
+	}
+}
+void printFunctionList(struct functionEntity *node)
+{
+	while(node != NULL)
+	{
+		printf("Function Name: %s\n", node->Name);
+		node = node->next;
+	}
+}
+void variableListAppend(struct variableEntity** head_rf, char *name)
+{
+	struct variableEntity* new_var = (struct variableEntity*) malloc(sizeof(struct variableEntity));
+	struct variableEntity *end = *head_rf;
+	
+	new_var->Name = name;
+	new_var->next = NULL;
+	
+	if(*head_rf == NULL)
+	{
+		*head_rf = new_var;
+		return;
+	}
+	
+	while(end->next != NULL)
+	{
+		end = end->next;
+	}
+	
+	end->next = new_var;
+	
+	return;
+}
+void functionListAppend(struct functionEntity** head_rf, char *name)
+{
+	struct functionEntity* new_var = (struct functionEntity*) malloc(sizeof(struct functionEntity));
+	struct functionEntity *end = *head_rf;
+	
+	new_var->Name = name;
+	new_var->next = NULL;
+	
+	if(*head_rf == NULL)
+	{
+		*head_rf = new_var;
+		return;
+	}
+	
+	while(end->next != NULL)
+	{
+		end = end->next;
+	}
+	
+	end->next = new_var;
+	
+	return;
+}
+int variableSearch(struct variableEntity* head, char *key)
+{
+	struct variableEntity* lookup = head;
+
+	while(lookup != NULL)
+	{
+		if(strcmp(lookup->Name, key) == 0)
+		{
+			return 1;
+		}
+		lookup = lookup->next;
+	}
+	return 0;
+}
+int functionSearch(struct functionEntity* head, char *key)
+{
+	struct functionEntity* lookup = head;
+	
+	while(lookup != NULL)
+	{
+		if(strcmp(lookup->Name, key) == 0)
+		{
+			return 1;
+		}
+		lookup = lookup->next;
+	}
+	return 0;
+}
+
+struct variableEntity* variables = NULL;
+struct functionEntity* functions = NULL;
+
 %}
 
 %union {
@@ -47,6 +151,15 @@ program: program_declaration main_statement newline { printf("Code Parsed succes
 
 program_declaration: PROGRAM NAME newline { progr = $2; }
                    ;
+               
+variable_declaration: VARS datatype declared_variables ';' newline
+                    | variable_declaration VARS datatype declared_variables ';' newline
+                    ;
+                   
+declared_variables: NAME { if(variableSearch(variables, $1) == 0){ variableListAppend(&variables, $1); } }
+                  | NAME ARRAY { if(variableSearch(variables, $1) == 0){variableListAppend(&variables, $1); } }
+                  | declared_variables ',' declared_variables
+                  ;
                    
 struct_statement: STRUCT NAME newline struct_variable ENDSTRUCT
                 | STRUCT NAME newline struct_variable ENDSTRUCT struct_statement
@@ -54,20 +167,12 @@ struct_statement: STRUCT NAME newline struct_variable ENDSTRUCT
                 | TYPEDEF STRUCT USERDATATYPE newline struct_variable USERDATATYPE ENDSTRUCT struct_statement
                 ;
                 
-struct_variable: VARS datatype NAME ';' newline
-               | VARS datatype NAME ARRAY ';' newline
-               | VARS datatype NAME ';' newline variable_declaration
-               | VARS datatype NAME ARRAY ';' newline variable_declaration
+struct_variable: VARS datatype NAME ';' newline { if(variableSearch(variables, $3) == 0){ variableListAppend(&variables, $3); } }
+               | VARS datatype NAME ARRAY ';' newline { if(variableSearch(variables, $3) == 0) { variableListAppend(&variables, $3); } }
+               | VARS datatype NAME ';' newline struct_variable { if(variableSearch(variables, $3) == 0) { variableListAppend(&variables, $3); } }
+               | VARS datatype NAME ARRAY ';' newline struct_variable { if(variableSearch(variables, $3) == 0) { variableListAppend(&variables, $3); } }
                ;
-
-main_statement: STARTMAIN commands ENDMAIN /*{ printf("MAIN Statement found\n"); }*/
-              | STARTMAIN variable_declaration commands ENDMAIN /*{ printf("MAIN Statement found\n"); }*/
-              ;
-                   
-variable_declaration: VARS datatype variable ';' newline /*{ printf("Variable Statement found\n"); }*/
-                    | VARS datatype variable ';' newline variable_declaration /*{ printf("Variable Statement found\n"); }*/
-                    ;
-                    
+                  
 function: function_declaration commands function_end newline /*{ printf("Function Statement found\n"); }*/
         | function_declaration variable_declaration commands function_end newline /*{ printf("Function Statement found\n"); }*/
         | function_declaration commands newline function_end newline function /*{ printf("Function Statement found\n"); }*/
@@ -77,14 +182,25 @@ function: function_declaration commands function_end newline /*{ printf("Functio
 function_declaration: FUNCTION function_name newline /*{ printf("Function Declared\n"); }*/
                     ;
                     
-function_name: NAME '(' variable ')'
+function_name: NAME '(' function_arguments ')' { if(functionSearch(functions, $1) == 0) { functionListAppend(&functions, $1); } }
              ;
+             
+function_statement: NAME '(' variable ')' { if(functionSearch(functions, $1) == 0) { line++; printf("\nERROR: Function %s is NOT declared, in line %d\n",$1,line); fprintf(diagnostics,"ERROR: Function %s is NOT declared, in line %d\n",$1,line); YYABORT; } }
+                  ;
+             
+function_arguments: NAME { if(variableSearch(variables, $1) == 0) { variableListAppend(&variables, $1); } }
+                  | function_arguments ',' function_arguments
+                  ;
              
 function_end: RETURN NUM END_FUNCTION
             | RETURN CHARLITERAL END_FUNCTION
             | RETURN variable END_FUNCTION
             ;
-            
+
+main_statement: STARTMAIN commands ENDMAIN /*{ printf("MAIN Statement found\n"); }*/
+              | STARTMAIN variable_declaration commands ENDMAIN /*{ printf("MAIN Statement found\n"); }*/
+              ;
+
 command: assignment
        | print_statement
        | loop_statement
@@ -96,8 +212,8 @@ commands: command newline
         | command newline commands
         ;
              
-assignment: variable '=' expression ';' /*{ printf("Assignment statement found\n"); }*/
-          | variable '=' expression ';' assignment /*{ printf("Assignment statement found\n"); }*/
+assignment: variable '=' expression ';'
+          | assignment variable '=' expression ';'
           ;
           
 loop_statement: while_statement
@@ -122,7 +238,7 @@ condition: expression COMP_OPERATOR expression
          | '(' condition ')' OR '(' condition ')'
          ;
                
-for_statement: FOR NAME ASSIGN_OPERATOR NUM TO NUM STEP NUM newline commands ENDFOR /*{ printf("For Loop statement found\n"); }*/
+for_statement: FOR NAME ASSIGN_OPERATOR NUM TO NUM STEP NUM newline commands ENDFOR { if(variableSearch(variables, $<str>2) == 0) { line++; printf("\nERROR: Variable %s is NOT declared, in line %d\n",$<str>2,line); fprintf(diagnostics,"ERROR: Variable %s is NOT declared, in line %d\n",$<str>2,line); YYABORT; } }
              ;
              
 if_statement: IF '(' condition ')' THEN newline commands ENDIF /*{ printf("If statement found\n"); }*/
@@ -155,7 +271,7 @@ print_statement: PRINT '(' STRLITERAL ')' ';' /*{ printf("Print Statement found\
 
 expression: literal
           | variable
-          | function_name
+          | function_statement
           | expression '+' expression
           | expression '-' expression
           | expression '^' expression
@@ -163,22 +279,21 @@ expression: literal
           | expression '/' expression
           | '(' expression ')'
           ;
-          
+
+variable: NAME { if(variableSearch(variables, $<str>1) == 0) { line++; printf("\nERROR: Variable %s is NOT declared, in line %d\n",$<str>1,line); fprintf(diagnostics,"ERROR: Variable %s is NOT declared, in line %d\n",$<str>1,line); YYABORT; } } 
+        | NAME ARRAY { if(variableSearch(variables, $<str>1) == 0) { line++; printf("\nERROR: Variable %s is NOT declared, in line %d\n",$<str>1,line); fprintf(diagnostics,"ERROR: Variable %s is NOT declared, in line %d\n",$<str>1,line); YYABORT; } }
+        | variable ',' variable
+        ;
+        
 datatype: DATATYPE
         | USERDATATYPE
-        ;
-
-variable: NAME
-        | NAME ARRAY
-        | NAME ',' variable
-        | NAME ARRAY ',' variable
         ;
         
 literal: NUM
        | STRLITERAL
        | CHARLITERAL
        ;
-
+       
 newline: NEWLINE { line++; }
        ;
 
@@ -191,7 +306,7 @@ void yyerror(char *s)
 }									
 
 
-int main ( int argc, char **argv  ) 
+int main (int argc, char **argv) 
 {
 	++argv; --argc;
 	if ( argc > 0 )
@@ -214,6 +329,12 @@ int main ( int argc, char **argv  )
 	fprintf(diagnostics, "Lines of code parsed: %i\n", line);
 	fprintf(diagnostics, "\n**** END of Diagnostic Messages ****\n");
 	fclose(diagnostics);
+	
+	printf("\nVariable List Items: \n");
+	printVariableList(variables);
+	
+	printf("\nFunction List Items: \n");
+	printFunctionList(functions);
   
 	return 0;
 }
