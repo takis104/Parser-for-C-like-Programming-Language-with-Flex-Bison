@@ -1,9 +1,13 @@
+/* Created by Christos-Panagiotis Balatsouras, StudentID = 1054335
+   CEID - University of Patras */
+/*Program declaration*/
 PROGRAM Sorting_Algorithms %This is a test program for lexer and parser development purposes
+/*Struct declaration*/
 TYPEDEF STRUCT Node
 	VARS INTEGER value;
 	VARS Node prev;
 	VARS Node next;
-Node ENDSTRUCT FUNCTION BubbleSort(K, m)
+Node ENDSTRUCT /*Function declaration*/ FUNCTION BubbleSort(K, m)
 	VARS INTEGER i,j,head,head2,temp;
 	VARS INTEGER K_i,K_i_plus_1,K_m;
 	i = 0;
@@ -45,6 +49,7 @@ FUNCTION InsertionSort(K, m)
 		K_i_plus_1 = k;
 	ENDFOR
 RETURN K_m END_FUNCTION
+/*Main part of program*/
 STARTMAIN VARS INTEGER n,i,c,A[20];
 	VARS INTEGER values[20];
 	VARS INTEGER option;
