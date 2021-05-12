@@ -17,6 +17,6 @@ Flex and Bison must be installed in the Linux machine before.
 
 1. bison -y -d c-like_parser.y
 2. flex c-like_lexer.l
-3. gcc y.tab.c lex.yy.c -lfl
-4. ./a.out prog.c
+3. gcc -o myparser y.tab.c lex.yy.c -lfl
+4. ./myparser prog.c
 
