@@ -27,6 +27,7 @@ basicstring 	{basiccharacter}*
 name 		{letter}{basicstring}|{underscore}{basicstring}
 array		"["{number}"]"
 
+%x MULTILINECOMM
 %%
 
 [ \t]+		{ yylval.str = strdup(yytext); ECHO; printf("%s",yytext);}
@@ -81,5 +82,10 @@ array		"["{number}"]"
 {number}	{ yylval.str = strdup(yytext); ECHO; printf("%s",yytext); return NUM; }
 {array}	{ yylval.str = strdup(yytext); ECHO; printf("%s",yytext); return ARRAY; }
 {comparative}	{ yylval.str = strdup(yytext); ECHO; printf("%s",yytext); return COMP_OPERATOR; }
+"/*"		{ yylval.str = strdup(yytext); ECHO; printf("%s",yytext); BEGIN(MULTILINECOMM);}
+<MULTILINECOMM>[^*\n]*			{ yylval.str = strdup(yytext); ECHO; printf("%s",yytext); }
+<MULTILINECOMM>"*"+[^*/\n]*		{ yylval.str = strdup(yytext); ECHO; printf("%s",yytext); }
+<MULTILINECOMM>"\n"			{ yylval.str = strdup(yytext); ECHO; printf("%s",yytext); }
+<MULTILINECOMM>"*"+"/"|"*"+"/"+"\n"	{ yylval.str = strdup(yytext); ECHO; printf("%s",yytext); BEGIN(INITIAL); }
 
 %%
