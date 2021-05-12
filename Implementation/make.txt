@@ -1,4 +1,4 @@
 bison -y -d c-like_parser.y
 flex c-like_lexer.l
-gcc y.tab.c lex.yy.c -lfl
-./a.out prog.c
+gcc -o myparser y.tab.c lex.yy.c -lfl
+./myparser prog.c
