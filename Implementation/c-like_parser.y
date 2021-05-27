@@ -159,47 +159,47 @@ program: program_declaration main_statement newline { printf("Code Parsed succes
 
 program_declaration: PROGRAM NAME newline { progr = $2; }
                    ;
-               
+
 variable_declaration: VARS datatype declared_variables ';' newline
-                    | VARS datatype declared_variables ';' newline variable_declaration
+                    | variable_declaration VARS datatype declared_variables ';' newline
                     ;
 
 declared_variables: NAME { if(variableSearch(variables, $1) == 0){ variableListAppend(&variables, $1); } }
                   | NAME ARRAY { if(variableSearch(variables, $1) == 0){variableListAppend(&variables, $1); } }
                   | declared_variables ',' declared_variables
                   ;
-                   
+
 struct_statement: STRUCT NAME newline struct_variable ENDSTRUCT
-                | STRUCT NAME newline struct_variable ENDSTRUCT struct_statement
+                | struct_statement STRUCT NAME newline struct_variable ENDSTRUCT
                 | TYPEDEF STRUCT USERDATATYPE newline struct_variable USERDATATYPE ENDSTRUCT
-                | TYPEDEF STRUCT USERDATATYPE newline struct_variable USERDATATYPE ENDSTRUCT struct_statement
+                | struct_statement TYPEDEF STRUCT USERDATATYPE newline struct_variable USERDATATYPE ENDSTRUCT
                 ;
-                
+
 struct_variable: VARS datatype NAME ';' newline { if(variableSearch(variables, $3) == 0){ variableListAppend(&variables, $3); } }
                | VARS datatype NAME ARRAY ';' newline { if(variableSearch(variables, $3) == 0) { variableListAppend(&variables, $3); } }
-               | VARS datatype NAME ';' newline struct_variable { if(variableSearch(variables, $3) == 0) { variableListAppend(&variables, $3); } }
-               | VARS datatype NAME ARRAY ';' newline struct_variable { if(variableSearch(variables, $3) == 0) { variableListAppend(&variables, $3); } }
+               | struct_variable VARS datatype NAME ';' newline { if(variableSearch(variables, $4) == 0) { variableListAppend(&variables, $4); } }
+               | struct_variable VARS datatype NAME ARRAY ';' newline { if(variableSearch(variables, $4) == 0) { variableListAppend(&variables, $4); } }
                ;
-                  
+
 function: function_declaration commands function_end newline /*{ printf("Function Statement found\n"); }*/
         | function_declaration variable_declaration commands function_end newline /*{ printf("Function Statement found\n"); }*/
-        | function_declaration commands newline function_end newline function /*{ printf("Function Statement found\n"); }*/
-        | function_declaration variable_declaration commands function_end newline function /*{ printf("Function Statement found\n"); }*/
+        | function function_declaration commands newline function_end newline /*{ printf("Function Statement found\n"); }*/
+        | function function_declaration variable_declaration commands function_end newline /*{ printf("Function Statement found\n"); }*/
         ;
-         
+
 function_declaration: FUNCTION function_name newline /*{ printf("Function Declared\n"); }*/
                     ;
-                    
+
 function_name: NAME '(' function_arguments ')' { if(functionSearch(functions, $1) == 0) { functionListAppend(&functions, $1); } }
              ;
-             
+
 function_statement: NAME '(' variable ')' { if(functionSearch(functions, $1) == 0) { printf("\nERROR: Function %s is NOT declared, in line %d\n",$1,yylineno); fprintf(diagnostics,"ERROR: Function %s is NOT declared, in line %d\n",$1,yylineno); YYABORT; } }
                   ;
              
 function_arguments: NAME { if(variableSearch(variables, $1) == 0) { variableListAppend(&variables, $1); } }
                   | function_arguments ',' function_arguments
                   ;
-             
+
 function_end: RETURN NUM END_FUNCTION
             | RETURN CHARLITERAL END_FUNCTION
             | RETURN variable END_FUNCTION
@@ -217,17 +217,17 @@ command: assignment
        ;
        
 commands: command newline
-        | command newline commands
+        | commands command newline
         ;
-             
+
 assignment: variable '=' expression ';'
-          | variable '=' expression ';' assignment
+          | assignment variable '=' expression ';'
           ;
-          
+
 loop_statement: while_statement
               | for_statement
               ;
-              
+
 break_command: BREAK ';' /*{ printf("Break command found\n"); }*/
              ;
              
@@ -245,10 +245,10 @@ condition: expression COMP_OPERATOR expression
          | '(' condition ')' AND '(' condition ')'
          | '(' condition ')' OR '(' condition ')'
          ;
-               
+
 for_statement: FOR NAME ASSIGN_OPERATOR NUM TO NUM STEP NUM newline commands ENDFOR { if(variableSearch(variables, $<str>2) == 0) { printf("\nERROR: Variable %s is NOT declared, in line %d\n",$<str>2,yylineno); fprintf(diagnostics,"ERROR: Variable %s is NOT declared, in line %d\n",$<str>2,yylineno); YYABORT; } }
              ;
-             
+
 if_statement: IF '(' condition ')' THEN newline commands ENDIF /*{ printf("If statement found\n"); }*/
             | IF '(' condition ')' THEN newline commands else_if_statement ENDIF /*{ printf("If statement found\n"); }*/
             | IF '(' condition ')' THEN newline commands else_statement ENDIF /*{ printf("If statement found\n"); }*/
@@ -256,23 +256,23 @@ if_statement: IF '(' condition ')' THEN newline commands ENDIF /*{ printf("If st
             ;
             
 else_if_statement: ELSEIF '(' condition ')' newline commands
-                 | ELSEIF '(' condition ')' newline commands else_if_statement
+                 | else_if_statement ELSEIF '(' condition ')' newline commands
                  ;
-                 
+
 else_statement: ELSE newline commands
               ;
-              
+
 switch_statement: SWITCH '(' expression ')' newline case ENDSWITCH /*{ printf("Switch statement found\n"); }*/
                 | SWITCH '(' expression ')' newline case default ENDSWITCH /*{ printf("Switch statement found\n"); }*/
                 ;
-                
+
 case: CASE '(' expression ')' ':' newline commands
-    | CASE '(' expression ')' ':' newline commands case
+    | case CASE '(' expression ')' ':' newline commands
     ;
-    
+
 default: DEFAULT ':' newline commands
        ;
-       
+
 print_statement: PRINT '(' STRLITERAL ')' ';' /*{ printf("Print Statement found\n"); }*/
                | PRINT '(' STRLITERAL ',' variable ')' ';' /*{ printf("Print Statement found\n"); }*/
                ;
@@ -288,20 +288,20 @@ expression: literal
           | '(' expression ')'
           ;
 
-variable: NAME { if(variableSearch(variables, $<str>1) == 0) { printf("\nERROR: Variable %s is NOT declared, in line %d\n",$<str>1,yylineno); fprintf(diagnostics,"ERROR: Variable %s is NOT declared, in line %d\n",$<str>1,yylineno); YYABORT; } } 
+variable: NAME { if(variableSearch(variables, $<str>1) == 0) { printf("\nERROR: Variable %s is NOT declared, in line %d\n",$<str>1,yylineno); fprintf(diagnostics,"ERROR: Variable %s is NOT declared, in line %d\n",$<str>1,yylineno); YYABORT; } }
         | NAME ARRAY { if(variableSearch(variables, $<str>1) == 0) { printf("\nERROR: Variable %s is NOT declared, in line %d\n",$<str>1,yylineno); fprintf(diagnostics,"ERROR: Variable %s is NOT declared, in line %d\n",$<str>1,yylineno); YYABORT; } }
         | variable ',' variable
         ;
-        
+
 datatype: DATATYPE
         | USERDATATYPE
         ;
-        
+
 literal: NUM
        | STRLITERAL
        | CHARLITERAL
        ;
-       
+
 newline: NEWLINE /*{ line++; }*/
        ;
 
