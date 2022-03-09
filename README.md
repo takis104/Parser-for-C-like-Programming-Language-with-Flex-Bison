@@ -1,4 +1,4 @@
-# Flex-Bison-Project-2021-CEID_NY132
+#  Parser-for-C-like-Programming-Language-with-Flex-Bison
 Flex-Bison Project 2021 - Compulsory project for the undergraduate course "Principles of programming languages and compilers - CEID_NY132"
 
 Implementation of a lexical analyzer using FLEX and a syntax analyzer using BISON, in order to recognize a C-like custom made programming language.
