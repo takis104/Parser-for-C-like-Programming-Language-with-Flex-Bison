@@ -3,6 +3,6 @@
 Code Parsed successfully!
 Program: Sorting_Algorithms
 
-Lines of code scanned and parsed: 87
+Lines of code scanned and parsed: 86
 
 **** END of Diagnostic Messages ****
