@@ -7,9 +7,7 @@ TYPEDEF STRUCT Node
 	VARS INTEGER value;
 	VARS Node prev;
 	VARS Node next;
-Node ENDSTRUCT 
-/*Function declaration*/ 
-FUNCTION BubbleSort(K, m)
+Node ENDSTRUCT /*Function declaration*/ FUNCTION BubbleSort(K, m)
 	VARS INTEGER i,j,head,head2,temp;
 	VARS INTEGER K_i,K_i_plus_1,K_m;
 	i = 0;
