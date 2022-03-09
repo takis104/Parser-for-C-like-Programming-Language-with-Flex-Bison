@@ -63,7 +63,6 @@ STARTMAIN VARS INTEGER n,i,c,A[20];
 	PRINT("\nOptions: \n");
 	PRINT("1. Bubble-Sort:\n");
 	PRINT("2. Insertion-Sort:\n");
-	PRINT("3. Selection-Sort:\n");
 	PRINT("Select Algorithm >> "); %scanf an option from keyboard
 	SWITCH (option)
 	CASE (1):
