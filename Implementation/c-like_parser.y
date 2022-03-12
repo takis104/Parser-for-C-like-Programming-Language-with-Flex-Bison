@@ -1,4 +1,3 @@
-/* Created by Christos-Panagiotis Mpalatsouras */
 
 %{
 #include <stdio.h>
@@ -7,8 +6,9 @@
 
 #define YYERROR_VERBOSE 1
 
-void yyerror(char *);
-extern FILE *yyin;							
+int yylex(); /*this code line added to avoid the "implicit declaration of function ‘yylex’"*/
+void yyerror(const char *); /*this code line added to avoid the "passing argument 1 of ‘yyerror’ discards ‘const’ qualifier from pointer target type" */
+extern FILE *yyin;
 extern FILE *yyout;
 extern int yylineno;
 int line = 0;
@@ -308,7 +308,7 @@ newline: NEWLINE /*{ line++; }*/
 
 %%
 
-void yyerror(char *s) 
+void yyerror(const char *s)
 {
     fprintf(stderr, "ERROR: %s in line %d\n", s, yylineno);
     fprintf(diagnostics, "ERROR: %s in line %d\n", s, yylineno);
@@ -316,11 +316,16 @@ void yyerror(char *s)
 
 int main (int argc, char **argv) 
 {
-	++argv; --argc;
+	++argv;
+	--argc;
 	if ( argc > 0 )
-	        yyin = fopen( argv[0], "r" );
+	{
+		yyin = fopen( argv[0], "r" );
+	}
 	else
-	        yyin = stdin;
+	{
+		yyin = stdin; 
+	}
 	yyout = fopen ( "output.c", "w" );
 	
 	printf("C-like parser, implemented by Christos-Panagiotis Mpalatsouras, Student ID = 1054335\n");
